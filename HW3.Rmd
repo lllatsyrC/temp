@@ -1,0 +1,194 @@
+---
+title: "HW3"
+author: "Crystal Huang"
+date: "2025-07-13"
+output: pdf_document
+---
+Make sure you put your name in the author and date above.
+
+
+**25 points total for this section.**
+
+```{r setup, include=FALSE}
+
+#PLEASE RUN THIS CHUNK BEFORE YOU BEGIN
+#Please ensure you do library(FSA) in order to be able to use the package later
+library(FSA)
+
+```
+
+
+```{r}
+#Please set your HSS where you have the NHANES.RData and this template saved, as your working directory first.
+#If you continue to have trouble, you could just click on the "NHANES.RData" file name under "Files" at the bottom right panel.
+
+load("NHANES.RData")
+
+```
+
+**Study about vitamin D3, arthritis, sleep hours per wkday and thyroid problem among 30+ year olds"**
+
+
+First, set up your study dataset:
+
+```{r}
+#[1 pt] Create a new dataset called NHANES_2 according to the flowchart in Canvas - 1 line:
+NHANES_2 <- subset(NHANES, 
+                   age>=30 & 
+                     !is.na(vitamin_d3) & 
+                     !is.na(arthritis) & 
+                     !is.na(sleephrs_wkday) &
+                     !is.na(thyroid_problem))
+
+```
+
+
+```{r}
+
+#[1 pt] Check the age range - first, show that the original NHANES includes ages 0-80; then, show that NHANES_2 indeed includes only ages 30+ - 2 lines:
+range(NHANES$age)
+range(NHANES_2$age)
+
+#[1 pt] Check for missing data for vitamin_d3 - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$vitamin_d3))
+sum(is.na(NHANES_2$vitamin_d3))
+
+#[1 pt] Check for missing data for arthritis - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$arthritis))
+sum(is.na(NHANES_2$arthritis))
+
+#[1 pt] Check for missing data for sleephrs_wkday - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$sleephrs_wkday))
+sum(is.na(NHANES_2$sleephrs_wkday))
+
+#[1 pt] (v) Check for missing data for thyroid_problem - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$thyroid_problem))
+sum(is.na(NHANES_2$thyroid_problem))
+
+```
+***Evaluate the impact of thyroid problem (2 categories) on vitamin D3 (continous variable) and sleep hours per work day (discrete variable)***
+
+
+```{r}
+#[1 pt] Tabulate the number of people in the thyroid_problem yes vs. no groups (hint, don't forget to include "exclude=F" in your code - 1 line:
+table(NHANES_2$thyroid_problem, exclude=F)
+
+#[1 pt] [1 pt] Calculate Vitamin D3 mean by thyroid_problem yes vs. no groups - 1 line:
+tapply(NHANES_2$vitamin_d3, NHANES_2$thyroid_problem, mean)
+
+#[1 pt] Calculate Vitamin D3 SD by thyroid_problem yes vs. no groups - 1 line:
+tapply(NHANES_2$vitamin_d3, NHANES_2$thyroid_problem, sd)
+
+```
+
+
+```{r}
+#[1 pts] Show how you did your t-test for vitamin_d3 and thyroid_problem - 1 line:
+t.test(vitamin_d3 ~ thyroid_problem, data=NHANES_2, var.equal=T)
+
+```
+
+This is how you could plot a box plot, if you are interested in learning more:
+
+```{r}
+boxplot(sleephrs_wkday ~ thyroid_problem, data=NHANES_2)
+```
+
+
+
+
+```{r}
+#[1 pts] Compute the quantiles for sleephrs_wkday by thyroid_problem group - 1 line:
+tapply(NHANES_2$sleephrs_wkday, NHANES_2$thyroid_problem, quantile)
+
+#[1 pts] Perform the Mann-Whitney U test to compare the median sleephrs_wkday of thyroid_problem Yes vs. No subjects - line:
+wilcox.test(sleephrs_wkday ~ thyroid_problem, data = NHANES_2)
+
+```
+##Assess the association of arthritis types (4 categories) with age (continuous variable) and sleep hours per workday (discrete variable)
+
+```{r}
+#Providing the table for arthritis types (bonus) - 
+table(NHANES_2$arthritis, exclude=F)
+```
+
+
+
+```{r}
+#[1 pt] Provide the number of subjects in each arthritis group (hint: don't forget "exclude=F") - 1 line:
+table(NHANES_2$arthritis, exclude = FALSE)
+
+#[1 pt] Provide the overall mean of age - 1 line:
+mean(NHANES_2$age)
+
+#[1 pt] The overall SD of age - 1 line:
+sd(NHANES_2$age)
+
+#[1 pt] The mean of age by arthritis - 1 line:
+tapply(NHANES_2$age, NHANES_2$arthritis, mean)
+
+#[1 pt] The SD of age by arthritis - 1 line
+tapply(NHANES_2$age, NHANES_2$arthritis, sd)
+
+```
+
+```{r}
+#[2pts] Conduct a one-way anova of age comparisons by arthritis - 2 lines
+anova_model <- aov(age ~ arthritis, data = NHANES_2)
+summary(anova_model)
+
+```
+
+```{r}
+#[1pts] Posthoc analysis for the one-way anova test you conducted above - 1 line
+TukeyHSD(anova_model)
+
+```
+```{r}
+#[1 pt] The overall quantiles of sleephrs_wkday - 1 line:
+quantile(NHANES_2$sleephrs_wkday)
+
+#[1 pt] The quantiles of sleephrs_wkday by arthritis - 1 line:
+tapply(NHANES_2$sleephrs_wkday, NHANES_2$arthritis, quantile)
+
+```
+
+```{r}
+#[1pts] Conduct a Kruskal Wallis test to compare the median sleephrs_wkday across arthritis categories - 1 line
+kruskal.test(sleephrs_wkday ~ arthritis, data = NHANES_2)
+
+```
+
+
+```{r}
+#[1pts] Posthoc analysis for the Kruskal-Wallis test you conducted above - 1 line
+pairwise.wilcox.test(NHANES_2$sleephrs_wkday, NHANES_2$arthritis, p.adjust.method = "BH")
+
+```
+
+```{r}
+#Create a new categorical variable, called arthritis_cat - where you re-categorise the arthritis variable into 3 categories as done here - we have provided the code, but please make sure you know how to do these steps!
+
+NHANES_2$arthritis_cat <- ifelse(NHANES_2$arthritis=="Osteoarthritis or degenerative arthritis", "osteo", ifelse(NHANES_2$arthritis=="Other"| NHANES_2$arthritis=="Psoriatic arthritis", "other_psoriatic", ifelse(NHANES_2$arthritis=="Rheumatoid arthritis", "rheumatoid", NA)))
+
+NHANES_2$arthritis_cat <- factor(NHANES_2$arthritis_cat)    
+
+data.class(NHANES_2$arthritis_cat)
+
+table(NHANES_2$arthritis_cat, exclude=F)
+
+```
+
+
+
+```{r}
+#Let's create a table called chi, where you store a 2-way table of thyroid_problem with the new arthritis_cat category you created above.
+
+chi <- table(NHANES_2$thyroid_problem, NHANES_2$arthritis_cat, exclude=F)
+chi
+
+
+#[1pts] Please use the table "chi" created above to perform a chi-sq. test - 1 line
+chisq.test(chi)
+
+```
