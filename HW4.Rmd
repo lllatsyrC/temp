@@ -1,0 +1,81 @@
+---
+title: "HW4"
+author: "Crystal Huang"
+date: "2025-07-22"
+output: pdf_document
+---
+Make sure you put your name in the author and date above.
+
+
+**20 points total for this section.**
+
+
+```{r}
+#You know the drill!
+#Please set your HSS where you have the NHANES.RData and this template saved, as your working directory first.
+#If you continue to have trouble, you could just click on the "NHANES.RData" file name under "Files" at the bottom right panel.
+
+load("NHANES.RData")
+```
+
+**Study about waist vs. hip circumference among 30+  year old males"**
+
+
+First, set up your study dataset:
+
+```{r}
+#You know the drill here too!
+#[1 pt] Create a new dataset called NHANES_2 according to the flowchart in Canvas - 1 line:
+NHANES_2 <- subset(NHANES, 
+                   age >= 30 & sex == 'Male' &
+                     !is.na(waist_circ) & !is.na(hip_circ))
+
+```
+
+
+```{r}
+#You know the drill here too!
+#[1 pt] Check the age range - first, show that the original NHANES includes ages 0-80; then, show that NHANES_2 indeed includes only ages 30+ - 2 lines:
+range(NHANES$age)
+range(NHANES_2$age)
+
+#[1 pt] Check the sex - first, show that the original NHANES includes females and males; then, show that NHANES_2 indeed includes only males - 2 lines (major hint: this would be a table of counts and don't forget to do exclude=F):
+table(NHANES$sex, exclude=F)
+table(NHANES_2$sex, exclude=F)
+
+
+#[1 pt] Check for missing data for waist_circ - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$waist_circ))
+sum(is.na(NHANES_2$waist_circ))
+
+#[1 pt] Check for missing data for hip_circ - first, show the number of missing data for  in the original NHANES; then, show that NHANES_2 does not have missing data on this variable - 2 lines:
+sum(is.na(NHANES$hip_circ))
+sum(is.na(NHANES_2$hip_circ))
+
+```
+***Evaluate the linear relationship between x=waist_circ (continuous) and y=hip_circ (continuous)***
+
+
+```{r}
+#[5pts] Plot the scatterplot and the linear regression line - 2 lines:
+plot(hip_circ ~ waist_circ, data=NHANES_2)
+abline(lm(hip_circ ~ waist_circ, data=NHANES_2), col="red")
+
+```
+
+
+```{r}
+#[5pts] Perform lm, save the results as a new object called "linreg" and evaluate the lm results with the summary() command - 2 lines:
+linreg <- lm(hip_circ ~ waist_circ, data=NHANES_2)
+summary(linreg)
+
+```
+
+
+```{r}
+#[5pts] Plot the residual plots - 1 line:
+#For your discussion, you can focus on the first two plots (1) Residuals vs. Fitted plot and (2) Q-Q plot
+plot(linreg)
+
+
+```
